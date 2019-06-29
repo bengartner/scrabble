@@ -35,8 +35,27 @@ score_lookup = {
     'z' : 10
 }
 
+word_list = []
+with open('enable1.txt', 'r') as f:
+    for line in f.readlines():
+        word_list.append(line.strip())
+
 def score_word_naive(word):
     sum_ = 0
     for letter in word:
         sum_ += score_lookup[letter]
     return sum_
+
+def iterate_over_subwords(word):
+    for i in range(0,len(word)+1):
+        for j in range(2,len(word)+1-i):
+            yield word[i:i+j]
+
+def score_word_complex(word):
+    subwords = set()
+    for subword in iterate_over_subwords(word):
+        if subword in word_list:
+            subwords.add(subword)
+    sum_ = sum([score_word_naive(subword) for subword in subwords])
+    return sum_
+

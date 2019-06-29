@@ -31,3 +31,13 @@ import pytest
 def test_naive_word_score(word, score):
     assert scrabble.score_word_naive(word) == score
 
+@pytest.mark.parametrize(
+    "word,subwords",
+    [
+        ("aah", ["aa", "ah"]),
+        ("aahed", ["aah", "aa", "ah", "ed", "he"]),
+        ("banana", ["ban", "ana", "an", "na", "nan", "ba", "nana"],)
+    ]
+)
+def test_complex_word_score(word, subwords):
+    assert scrabble.score_word_complex(word) == sum([scrabble.score_word_naive(subword) for subword in subwords + [word]])
