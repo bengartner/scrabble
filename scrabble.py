@@ -1,3 +1,6 @@
+import argparse
+import functools
+
 # 0: ?×2
 # 1: E×12 A×9 I×9 O×8 N×6 R×6 T×6 L×4 S×4 U×4
 # 2: D×4 G×3
@@ -29,6 +32,7 @@ score_lookup = {
     's' : 1,
     't' : 1,
     'u' : 1,
+    'v' : 4,
     'w' : 4,
     'x' : 8,
     'y' : 4,
@@ -40,17 +44,20 @@ with open('enable1.txt', 'r') as f:
     for line in f.readlines():
         word_list.append(line.strip())
 
+@functools.lru_cache(maxsize=1000000)
 def score_word_naive(word):
     sum_ = 0
     for letter in word:
         sum_ += score_lookup[letter]
     return sum_
 
+@functools.lru_cache(maxsize=1000000)
 def iterate_over_subwords(word):
     for i in range(0,len(word)+1):
         for j in range(2,len(word)+1-i):
             yield word[i:i+j]
 
+@functools.lru_cache(maxsize=1000000)
 def score_word_complex(word):
     subwords = set()
     for subword in iterate_over_subwords(word):
@@ -59,3 +66,11 @@ def score_word_complex(word):
     sum_ = sum([score_word_naive(subword) for subword in subwords])
     return sum_
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("threshold")
+    args = parser.parse_args()
+    for word in word_list:
+        score = score_word_complex(word)
+        if score > int(args.threshold):
+            print(f"{word} : {score}")
